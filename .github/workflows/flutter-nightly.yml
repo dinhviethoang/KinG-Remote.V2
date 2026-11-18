@@ -11,3 +11,36 @@ jobs:
       upload-artifact: true
       upload-tag: "nightly"
 
+
+  rename-release-files:
+    needs: run-flutter-nightly-build
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Rename release files to KinG_remote
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          mkdir -p work && cd work
+          gh release view nightly -R "$REPO" --json assets -q '.assets[].name' > names.txt
+          while read -r name; do
+            case "$name" in
+              *sciter*|*unsigned*)
+                gh release delete-asset nightly "$name" -R "$REPO" -y
+                continue
+                ;;
+              rustdesk*) ;;
+              *) continue ;;
+            esac
+            new="KinG_remote${name#rustdesk}"
+            gh release download nightly -R "$REPO" -p "$name" --clobber
+            mv "$name" "$new"
+            gh release upload nightly "$new" -R "$REPO" --clobber
+            gh release delete-asset nightly "$name" -R "$REPO" -y
+            rm -f "$new"
+          done < names.txt
+          gh release view nightly -R "$REPO" --json assets -q '.assets[].name'
