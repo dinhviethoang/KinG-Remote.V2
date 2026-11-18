@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_hbb/common/widgets/king_widgets.dart';
 import 'package:flutter_hbb/common/widgets/connection_page_title.dart';
 import 'package:flutter_hbb/consts.dart';
 import 'package:flutter_hbb/desktop/widgets/popup_menu.dart';
@@ -304,25 +305,44 @@ class _ConnectionPageState extends State<ConnectionPage>
   @override
   Widget build(BuildContext context) {
     final isOutgoingOnly = bind.isOutgoingOnly();
-    return Column(
-      children: [
-        Expanded(
-            child: Column(
-          children: [
-            Row(
-              children: [
-                Flexible(child: _buildRemoteIDTextField(context)),
-              ],
-            ).marginOnly(top: 22),
-            SizedBox(height: 12),
-            Divider().paddingOnly(right: 12),
-            Expanded(child: PeerTabPage()),
-          ],
-        ).paddingOnly(left: 12.0)),
-        if (!isOutgoingOnly) const Divider(height: 1),
-        if (!isOutgoingOnly) OnlineStatusWidget()
-      ],
-    );
+    return Stack(fit: StackFit.expand, children: [
+      const Positioned(
+        right: -210,
+        bottom: -230,
+        child: IgnorePointer(
+          child: Opacity(
+            opacity: 0.16,
+            child: KingGear(
+                size: 520, teeth: 28, period: Duration(seconds: 40)),
+          ),
+        ),
+      ),
+      Column(
+        children: [
+          Expanded(
+              child: Column(
+            children: [
+              LayoutBuilder(
+                builder: (context, constraints) => Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Flexible(child: _buildRemoteIDTextField(context)),
+                    if (constraints.maxWidth > 600)
+                      const KingRadar(size: 170).marginOnly(left: 16, right: 12),
+                  ],
+                ),
+              ).marginOnly(top: 22),
+              SizedBox(height: 12),
+              Divider().paddingOnly(right: 12),
+              Expanded(child: PeerTabPage()),
+            ],
+          ).paddingOnly(left: 12.0)),
+          const KingTicker(),
+          if (!isOutgoingOnly) const Divider(height: 1),
+          if (!isOutgoingOnly) OnlineStatusWidget()
+        ],
+      ),
+    ]);
   }
 
   /// Callback for the connect button.
@@ -379,9 +399,14 @@ class _ConnectionPageState extends State<ConnectionPage>
     var w = Container(
       width: 320 + 20 * 2,
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
-      decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(13)),
-          border: Border.all(color: Theme.of(context).colorScheme.background)),
+      decoration: const BoxDecoration(
+          color: Color(0xE60C0907),
+          border: Border(
+            top: BorderSide(color: KingColors.orange, width: 3),
+            bottom: BorderSide(color: KingColors.orange, width: 3),
+            left: BorderSide(color: KingColors.lineSoft),
+            right: BorderSide(color: KingColors.lineSoft),
+          )),
       child: Ink(
         child: Column(
           children: [
@@ -551,19 +576,17 @@ class _ConnectionPageState extends State<ConnectionPage>
             Padding(
               padding: const EdgeInsets.only(top: 13.0),
               child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                SizedBox(
-                  height: 28.0,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      onConnect();
-                    },
-                    child: Text(translate("Connect")),
-                  ),
+                KingConnectButton(
+                  label: translate("Connect"),
+                  height: 36,
+                  onPressed: () {
+                    onConnect();
+                  },
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  height: 28.0,
-                  width: 28.0,
+                  height: 36.0,
+                  width: 36.0,
                   decoration: BoxDecoration(
                     border: Border.all(color: Theme.of(context).dividerColor),
                     borderRadius: BorderRadius.circular(8),

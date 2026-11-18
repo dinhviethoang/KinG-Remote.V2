@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:auto_size_text_field/auto_size_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hbb/common/widgets/king_widgets.dart';
 import 'package:flutter_hbb/common/formatter/id_formatter.dart';
 import 'package:flutter_hbb/common/widgets/connection_page_title.dart';
 import 'package:flutter_hbb/models/state_model.dart';
@@ -86,7 +87,29 @@ class _ConnectionPageState extends State<ConnectionPage> {
             delegate: SliverChildListDelegate([
           if (!bind.isCustomClient() && !isIOS)
             Obx(() => _buildUpdateUI(stateGlobal.updateUrl.value)),
+          const KingHazardStripe(),
+          Row(
+            children: [
+              const KingEmblem(size: 64),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const KingTag('[02] REMOTE LINK'),
+                    const SizedBox(height: 4),
+                    Text('KinG-REMOTE',
+                        style: kingMono(
+                            size: 18, weight: FontWeight.w800, spacing: 3)),
+                  ],
+                ),
+              ),
+              const KingRadar(size: 72),
+            ],
+          ).marginSymmetric(vertical: 10),
           _buildRemoteIDTextField(),
+          const SizedBox(height: 8),
+          const KingTicker(),
         ])),
         SliverFillRemaining(
           hasScrollBody: true,

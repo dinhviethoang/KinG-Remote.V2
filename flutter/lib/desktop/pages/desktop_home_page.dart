@@ -61,14 +61,17 @@ class _DesktopHomePageState extends State<DesktopHomePage>
     super.build(context);
     final isIncomingOnly = bind.isIncomingOnly();
     return _buildBlock(
-        child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        buildLeftPane(context),
-        if (!isIncomingOnly) const VerticalDivider(width: 1),
-        if (!isIncomingOnly) Expanded(child: buildRightPane(context)),
-      ],
-    ));
+        child: Stack(fit: StackFit.expand, children: [
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          buildLeftPane(context),
+          if (!isIncomingOnly) const VerticalDivider(width: 1),
+          if (!isIncomingOnly) Expanded(child: buildRightPane(context)),
+        ],
+      ),
+      const Positioned.fill(child: KingScanOverlay()),
+    ]));
   }
 
   Widget _buildBlock({required Widget child}) {
@@ -89,11 +92,25 @@ class _DesktopHomePageState extends State<DesktopHomePage>
       const KingHazardStripe(),
       Align(
         alignment: Alignment.center,
-        child: const KingEmblem(size: 120).marginOnly(top: 16, bottom: 4),
+        child: const KingEmblem(size: 96).marginOnly(top: 14, bottom: 6),
+      ),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const KingTag('[01] LOCAL UNIT'),
+            const SizedBox(height: 4),
+            Text('YOUR DESKTOP',
+                style: kingMono(
+                    size: 19, weight: FontWeight.w800, spacing: 2)),
+          ],
+        ).marginOnly(left: 20, right: 16, bottom: 6),
       ),
       buildTip(context),
       if (!isOutgoingOnly) buildIDBoard(context),
       if (!isOutgoingOnly) buildPasswordBoard(context),
+      if (!isOutgoingOnly) _buildKingStatusPanel(),
       FutureBuilder<Widget>(
         future: Future.value(
             Obx(() => buildHelpCards(stateGlobal.updateUrl.value))),
@@ -131,7 +148,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
     return ChangeNotifierProvider.value(
       value: gFFI.serverModel,
       child: Container(
-        width: isIncomingOnly ? 280.0 : 200.0,
+        width: isIncomingOnly ? 280.0 : 240.0,
         color: Theme.of(context).colorScheme.background,
         child: Stack(
           children: [
@@ -180,6 +197,55 @@ class _DesktopHomePageState extends State<DesktopHomePage>
     );
   }
 
+  Widget _buildKingStatusPanel() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0A0806),
+            border: Border.all(color: KingColors.lineSoft),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              const KingEqualizer(bars: 8, height: 30, barWidth: 5),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('CORE OUTPUT',
+                        style: kingMono(
+                            size: 9, color: KingColors.muted, spacing: 2)),
+                    Text('NOMINAL',
+                        style: kingMono(
+                            size: 12, color: KingColors.orange, spacing: 2)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Obx(() {
+          final s = stateGlobal.svcStatus.value;
+          final ready = s == SvcStatus.ready;
+          return KingStatusRow(
+            label: 'STATUS',
+            value: ready
+                ? 'ONLINE'
+                : (s == SvcStatus.connecting ? 'LINKING' : 'OFFLINE'),
+            valueColor: ready ? KingColors.amber : kKingRed,
+            pulse: true,
+          );
+        }),
+        const KingStatusRow(label: 'CIPHER', value: 'E2E'),
+      ],
+    ).marginOnly(left: 20, right: 16, bottom: 8);
+  }
+
   buildRightPane(BuildContext context) {
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
@@ -197,7 +263,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
         textBaseline: TextBaseline.alphabetic,
         children: [
           Container(
-            width: 2,
+            width: 4,
             decoration: const BoxDecoration(color: MyTheme.accent),
           ).marginOnly(top: 5),
           Expanded(
@@ -241,9 +307,16 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                           contentPadding: EdgeInsets.only(top: 10, bottom: 10),
                         ),
                         style: TextStyle(
-                          fontSize: 22,
+                          fontFamily: kKingMono,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 21,
                           color: MyTheme.accent,
-                          letterSpacing: 1.5,
+                          letterSpacing: 1,
+                          shadows: [
+                            Shadow(
+                                color: MyTheme.accent.withOpacity(0.6),
+                                blurRadius: 12),
+                          ],
                         ),
                       ).workaroundFreezeLinuxMint(),
                     ),
@@ -305,9 +378,9 @@ class _DesktopHomePageState extends State<DesktopHomePage>
         textBaseline: TextBaseline.alphabetic,
         children: [
           Container(
-            width: 2,
+            width: 4,
             height: 52,
-            decoration: BoxDecoration(color: MyTheme.accent),
+            decoration: BoxDecoration(color: KingColors.amber),
           ),
           Expanded(
             child: Padding(

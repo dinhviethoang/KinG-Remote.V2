@@ -177,6 +177,13 @@ flutter:
     - family: More
       fonts:
         - asset: assets/more.ttf
+    - family: KingMono
+      fonts:
+        - asset: assets/king_mono_regular.ttf
+        - asset: assets/king_mono_bold.ttf
+          weight: 700
+        - asset: assets/king_mono_extrabold.ttf
+          weight: 800
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

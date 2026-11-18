@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_hbb/common/widgets/king_widgets.dart';
 import 'package:flutter_hbb/common/widgets/audio_input.dart';
 import 'package:flutter_hbb/consts.dart';
 import 'package:flutter_hbb/desktop/widgets/tabbar_widget.dart';
@@ -456,15 +457,13 @@ class _CmHeaderState extends State<_CmHeader>
   Widget build(BuildContext context) {
     super.build(context);
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        gradient: LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          colors: [
-            Color(0xff00bfe1),
-            Color(0xff0071ff),
-          ],
+      decoration: const BoxDecoration(
+        color: Color(0xF00C0907),
+        border: Border(
+          top: BorderSide(color: KingColors.orange, width: 3),
+          left: BorderSide(color: KingColors.line),
+          right: BorderSide(color: KingColors.line),
+          bottom: BorderSide(color: KingColors.line),
         ),
       ),
       margin: EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
@@ -593,22 +592,9 @@ class _CmHeaderState extends State<_CmHeader>
   }
 
   Widget _buildInitialAvatar() {
-    return Container(
-      width: 70,
-      height: 70,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: str2color(client.name),
-        borderRadius: BorderRadius.circular(15.0),
-      ),
-      child: Text(
-        client.name.isNotEmpty ? client.name[0] : '?',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-          fontSize: 55,
-        ),
-      ),
+    return KingHexAvatar(
+      letter: client.name.isNotEmpty ? client.name[0] : '?',
+      size: 70,
     );
   }
 }
@@ -630,31 +616,12 @@ class _PrivilegeBoardState extends State<_PrivilegeBoard> {
     return Tooltip(
       message: "$tooltipText: ${enabled ? "ON" : "OFF"}",
       waitDuration: Duration.zero,
-      child: Container(
-        decoration: BoxDecoration(
-          color: enabled
-              ? (canModify ? MyTheme.accent : MyTheme.accent.withOpacity(0.6))
-              : Colors.grey[700],
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        padding: EdgeInsets.all(8.0),
-        child: InkWell(
-          onTap: canModify
-              ? () =>
-                  checkClickTime(widget.client.id, () => onTap?.call(!enabled))
-              : null,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Expanded(
-                child: Icon(
-                  iconData,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-        ),
+      child: KingPermTile(
+        enabled: enabled,
+        canModify: canModify,
+        icon: iconData,
+        onTap: () =>
+            checkClickTime(widget.client.id, () => onTap?.call(!enabled)),
       ),
     );
   }
@@ -1037,16 +1004,10 @@ class _CmControlPanel extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: buildButton(context,
-                  color: Colors.redAccent,
-                  onClick: handleDisconnect,
-                  text: 'Disconnect',
-                  icon: Icon(
-                    Icons.link_off_rounded,
-                    color: Colors.white,
-                    size: 14,
-                  ),
-                  textColor: Colors.white),
+              child: KingTerminateButton(
+                label: translate('Disconnect'),
+                onTap: () => checkClickTime(client.id, handleDisconnect),
+              ).marginAll(4),
             ),
           ],
         )
